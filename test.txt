@@ -1,0 +1,1 @@
+mvn exec:java -Dexec.mainClass="com.SeimiCrawlerDemo.crawlers.Movie1Crawler" -Dexec.args="http://www.alljavonline.com/full-jav-online-23838/"
