@@ -43,14 +43,16 @@ public class TumCrawler extends BaseSeimiCrawler {
 
 	@Override
 	public String[] startUrls() {
-		return new String[] { "http://szfcat.tumblr.com/post" };
+		return new String[] { "http://tang8re.tumblr.com" };
 	}
 
 	@Override
 	public void start(Response response) {
 		JXDocument doc = response.document();
 		try {
-			List<Object> urls = doc.sel("//div[@class='tumblr_video_container']/iframe/@src");
+
+			List<Object> urls = doc.sel("//div[@class='video-container']/iframe/@src");
+			System.out.println("共获取" + urls.size());
 			if (!urls.isEmpty()) {
 				for (Object url : urls) {
 					Request request = new Request();
@@ -64,33 +66,33 @@ public class TumCrawler extends BaseSeimiCrawler {
 				logger.info("url[{}] is finished", response.getUrl());
 				return;
 			}
-			List<Object> images = doc.sel("//div[@class='html_photoset']/iframe/@src");
-			if (!images.isEmpty()) {
-				for (Object url : images) {
-					Request request = new Request();
-					request.setCrawlerName(crawlerName);
-					request.setUrl(url.toString());
-					request.setCallBack("parseImage");
-					request.setPriority(5);
-					queue.push(request);
-				}
-			}
-			List<Object> others = doc.sel("//a[@class='meta-item reblog-link']/@href");
-			if (!others.isEmpty()) {
-				for (Object other : others) {
-					String url = other.toString();
-					int endIndex = url.indexOf(".com");
-					if (endIndex > -1) {
-						String _url = url.substring(0, endIndex + 4);
-						Request request = new Request();
-						request.setCrawlerName(crawlerName);
-						request.setUrl(_url);
-						request.setCallBack("start");
-						queue.push(request);
-						logger.info("add {} url={} started", crawlerName, _url);
-					}
-				}
-			}
+//			List<Object> images = doc.sel("//div[@class='html_photoset']/iframe/@src");
+//			if (!images.isEmpty()) {
+//				for (Object url : images) {
+//					Request request = new Request();
+//					request.setCrawlerName(crawlerName);
+//					request.setUrl(url.toString());
+//					request.setCallBack("parseImage");
+//					request.setPriority(5);
+//					queue.push(request);
+//				}
+//			}
+//			List<Object> others = doc.sel("//a[@class='meta-item reblog-link']/@href");
+//			if (!others.isEmpty()) {
+//				for (Object other : others) {
+//					String url = other.toString();
+//					int endIndex = url.indexOf(".com");
+//					if (endIndex > -1) {
+//						String _url = url.substring(0, endIndex + 4);
+//						Request request = new Request();
+//						request.setCrawlerName(crawlerName);
+//						request.setUrl(_url);
+//						request.setCallBack("start");
+//						queue.push(request);
+//						logger.info("add {} url={} started", crawlerName, _url);
+//					}
+//				}
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -107,6 +109,7 @@ public class TumCrawler extends BaseSeimiCrawler {
 		request.setCrawlerName(crawlerName);
 		request.setUrl(url);
 		request.setCallBack("start");// 回调Crawler 的start
+		request.setPriority(1);
 		queue.push(request);// queue默认实现：DefaultLocalQueue
 		logger.info("add {} url={} started", crawlerName, url);
 	}
@@ -151,8 +154,10 @@ public class TumCrawler extends BaseSeimiCrawler {
 	public void parseVideo(Response response) {
 		counter.incrementAndGet();
 		try {
-			//String fileName = StringUtils.substringAfterLast(response.getUrl().replace("#_=_",""), "/");
-			String fileName = String.valueOf(counter.get())+".mp4";
+			// String fileName =
+			// StringUtils.substringAfterLast(response.getUrl().replace("#_=_",""),
+			// "/");
+			String fileName = String.valueOf(counter.get()) + ".mp4";
 			String path = Contants.VIDEODIR + fileName;
 			if (!new File(path).exists()) {
 				response.saveTo(new File(path));
