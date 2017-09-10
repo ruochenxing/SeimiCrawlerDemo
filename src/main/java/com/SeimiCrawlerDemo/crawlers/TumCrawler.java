@@ -24,6 +24,8 @@ public class TumCrawler extends BaseSeimiCrawler {
 	public static final ConcurrentHashMap<String, Integer> pageMap = new ConcurrentHashMap<>();
 	public static final String TRUE_VEDIO_URL = "https://vt.tumblr.com/%s.mp4#_=_";
 	public static final AtomicInteger counter = new AtomicInteger(0);
+
+	public static String startUrl = "";
 	static {
 		File file = new File(Contants.VIDEODIR);
 		if (!file.exists()) {
@@ -37,13 +39,20 @@ public class TumCrawler extends BaseSeimiCrawler {
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
+		if (args.length > 0) {
+			startUrl = args[0];
+		}
 		Seimi s = new Seimi();
 		s.start("tum");
 	}
 
 	@Override
 	public String[] startUrls() {
-		return new String[] { "http://tang8re.tumblr.com" };
+		if (StringUtils.isBlank(startUrl)) {
+			return new String[] { "http://tang8re.tumblr.com" };
+		} else {
+			return new String[] { startUrl };
+		}
 	}
 
 	@Override
@@ -66,33 +75,35 @@ public class TumCrawler extends BaseSeimiCrawler {
 				logger.info("url[{}] is finished", response.getUrl());
 				return;
 			}
-//			List<Object> images = doc.sel("//div[@class='html_photoset']/iframe/@src");
-//			if (!images.isEmpty()) {
-//				for (Object url : images) {
-//					Request request = new Request();
-//					request.setCrawlerName(crawlerName);
-//					request.setUrl(url.toString());
-//					request.setCallBack("parseImage");
-//					request.setPriority(5);
-//					queue.push(request);
-//				}
-//			}
-//			List<Object> others = doc.sel("//a[@class='meta-item reblog-link']/@href");
-//			if (!others.isEmpty()) {
-//				for (Object other : others) {
-//					String url = other.toString();
-//					int endIndex = url.indexOf(".com");
-//					if (endIndex > -1) {
-//						String _url = url.substring(0, endIndex + 4);
-//						Request request = new Request();
-//						request.setCrawlerName(crawlerName);
-//						request.setUrl(_url);
-//						request.setCallBack("start");
-//						queue.push(request);
-//						logger.info("add {} url={} started", crawlerName, _url);
-//					}
-//				}
-//			}
+			// List<Object> images =
+			// doc.sel("//div[@class='html_photoset']/iframe/@src");
+			// if (!images.isEmpty()) {
+			// for (Object url : images) {
+			// Request request = new Request();
+			// request.setCrawlerName(crawlerName);
+			// request.setUrl(url.toString());
+			// request.setCallBack("parseImage");
+			// request.setPriority(5);
+			// queue.push(request);
+			// }
+			// }
+			// List<Object> others = doc.sel("//a[@class='meta-item
+			// reblog-link']/@href");
+			// if (!others.isEmpty()) {
+			// for (Object other : others) {
+			// String url = other.toString();
+			// int endIndex = url.indexOf(".com");
+			// if (endIndex > -1) {
+			// String _url = url.substring(0, endIndex + 4);
+			// Request request = new Request();
+			// request.setCrawlerName(crawlerName);
+			// request.setUrl(_url);
+			// request.setCallBack("start");
+			// queue.push(request);
+			// logger.info("add {} url={} started", crawlerName, _url);
+			// }
+			// }
+			// }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
